@@ -1,4 +1,7 @@
 <?php
+
+
+
 session_start();
 $conn = new mysqli("localhost", "root", "", "computer_booking_system");
 
@@ -14,16 +17,10 @@ if (!isset($_SESSION['admin_id'])) {
 // Handle Adding a Computer
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['computer_name'])) {
     $computer_name = trim($_POST['computer_name']);
-
     if (!empty($computer_name)) {
         $stmt = $conn->prepare("INSERT INTO computers (computer_name, status, in_use) VALUES (?, 'available', 0)");
         $stmt->bind_param("s", $computer_name);
-
-        if ($stmt->execute()) {
-            echo "success";
-        } else {
-            echo "error: " . $stmt->error;
-        }
+        echo ($stmt->execute()) ? "success" : "error: " . $stmt->error;
         $stmt->close();
     } else {
         echo "error: Computer name cannot be empty";
@@ -36,12 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_id'])) {
     $id = $_POST['delete_id'];
     $stmt = $conn->prepare("DELETE FROM computers WHERE id = ?");
     $stmt->bind_param("i", $id);
-
-    if ($stmt->execute()) {
-        echo "success";
-    } else {
-        echo "error: " . $stmt->error;
-    }
+    echo ($stmt->execute()) ? "success" : "error: " . $stmt->error;
     $stmt->close();
     exit();
 }
@@ -55,10 +47,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_id'])) {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="bg-light">
+
+    <!-- ✅ Header / Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin_logout.php">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-5">
         <h2 class="text-center text-success">Admin Dashboard</h2>
 
-        <!-- Add Computer Form -->
+        <!-- ✅ Add Computer Form -->
         <div class="card mt-4">
             <div class="card-body">
                 <h5 class="card-title">Add a Computer</h5>
@@ -70,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_id'])) {
             </div>
         </div>
 
-        <!-- List of Computers -->
+        <!-- ✅ List of Computers -->
         <h4 class="mt-4">Available Computers</h4>
         <table class="table table-bordered">
             <thead>
@@ -94,12 +103,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_id'])) {
             </tbody>
         </table>
 
+        <!-- ✅ Generate Reports -->
+        <h4 class="mt-4">Generate Reports</h4>
+        <a href="generate_report.php?type=daily" class="btn btn-info">Download Daily Report</a>
+        <a href="generate_report.php?type=weekly" class="btn btn-primary">Download Weekly Report</a>
+        <a href="generate_report.php?type=monthly" class="btn btn-success">Download Monthly Report</a>
+
         <a href="admin_logout.php" class="btn btn-danger mt-3">Logout</a>
     </div>
 
+    <!-- ✅ Footer -->
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; <?php echo date("Y"); ?> Library Computer Booking System. All Rights Reserved.</p>
+    </footer>
+
     <script>
         $(document).ready(function() {
-            // Add Computer via AJAX
+            // ✅ Add Computer via AJAX
             $("#addComputerForm").submit(function(event) {
                 event.preventDefault();
                 var computer_name = $("#computer_name").val().trim();
@@ -114,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_id'])) {
                     data: { computer_name: computer_name },
                     success: function(response) {
                         if (response === "success") {
-                            location.reload(); // Reload page to update table
+                            location.reload();
                         } else {
                             $("#message").html("<div class='alert alert-danger'>" + response + "</div>");
                         }
@@ -122,7 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_id'])) {
                 });
             });
 
-            // Delete Computer via AJAX
+            // ✅ Delete Computer via AJAX
             $(document).on("click", ".delete-computer", function() {
                 var delete_id = $(this).data("id");
 
@@ -143,5 +163,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_id'])) {
             });
         });
     </script>
+
 </body>
 </html>

@@ -28,11 +28,31 @@ $bookedComputers = $conn->query("
     JOIN computers c ON b.computer_id = c.id
     WHERE NOW() < b.end_time
 ");
+if (isset($_SESSION['error'])): ?>
+    <div id="error-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            const alertBox = document.getElementById("error-alert");
+            if (alertBox) {
+                alertBox.classList.remove("show");
+                alertBox.classList.add("fade");
+                setTimeout(() => alertBox.remove(), 500); // fully remove from DOM
+            }
+        }, 5000); // 5 seconds
+    </script>
+<?php endif; 
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Computer Booking</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script>
@@ -77,7 +97,10 @@ $bookedComputers = $conn->query("
     <?php include 'navbar.php'; ?>
 
     <main class="container mt-4">
-        <h2>Dashboard</h2>
+    <div class="container text-center mt-5">
+    <h2 class="fw-bold text-primary">Library Computer Booking System</h2>
+</div>
+
 
         <h3 class="mt-4">Available Computers</h3>
         <div id="available-computers">
@@ -88,7 +111,7 @@ $bookedComputers = $conn->query("
                             echo "<option value='{$row['id']}'>{$row['computer_name']}</option>";
                         } ?>
                     </select>
-                    <button type="submit" class="btn btn-success">Book</button>
+                    <button type="submit" class="btn btn-success">Book computer</button>
                 </form>
             <?php } else { ?>
                 <div class="alert alert-info">No computers available. Try again later.</div>
